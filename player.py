@@ -5,6 +5,7 @@ from circleshape import CircleShape
 from constants import (
     LINE_WIDTH,
     PLAYER_RADIUS,
+    PLAYER_SHOOT_COOLDOWN_SECONDS,
     PLAYER_SPEED,
     PLAYER_TURN_SPEED,
     PLAYER_SHOOT_SPEED,
@@ -14,6 +15,7 @@ from constants import (
 class Player(CircleShape):
     def __init__(self, x, y, cooldown=0):
         super().__init__(x, y, PLAYER_RADIUS)
+        self.cooldown = cooldown
         self.rotation = 0
 
     def triangle(self):
@@ -28,6 +30,8 @@ class Player(CircleShape):
         pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
 
     def update(self, dt):
+        self.cooldown -= dt
+
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_a]:
@@ -43,6 +47,9 @@ class Player(CircleShape):
             self.move(dt)
 
         if keys[pygame.K_SPACE]:
+            if self.cooldown > 0:
+                return
+            self.cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
             self.shoot()
 
     def rotate(self, dt):
